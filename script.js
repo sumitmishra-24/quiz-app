@@ -23,6 +23,7 @@ const quizCategoryElement = document.getElementById("quiz-category");
 const finalScoreElement = document.getElementById("final-score");
 const percentageElement = document.getElementById("percentage");
 const performanceElement = document.getElementById("performance");
+const bestScoreElement = document.getElementById("best-score");
 
 // Quiz Questions
 const questions = [
@@ -202,6 +203,9 @@ let timeLeft = 15;
 let timerInterval = null;
 let answered = false;
 
+// Load saved best score
+let bestScore = Number(localStorage.getItem("quizBestScore")) || 0;
+
 // Shuffle array using Fisher-Yates algorithm
 function shuffleQuestions(array) {
   const shuffled = [...array];
@@ -302,13 +306,16 @@ function startTimer() {
 
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
+
       timeLeft = 0;
       timerElement.textContent = "Time's up!";
 
       if (!answered) {
         answered = true;
+
         disableOptions();
         showCorrectAnswer();
+
         nextButton.style.display = "block";
       }
     }
@@ -322,15 +329,18 @@ function selectAnswer(selectedButton, selectedOption) {
   }
 
   answered = true;
+
   clearInterval(timerInterval);
 
   const currentQuestion = quizQuestions[currentQuestionIndex];
 
   if (selectedOption === currentQuestion.answer) {
     score++;
+
     selectedButton.classList.add("correct");
   } else {
     selectedButton.classList.add("incorrect");
+
     showCorrectAnswer();
   }
 
@@ -348,7 +358,7 @@ function disableOptions() {
   });
 }
 
-// Highlight the correct answer
+// Highlight correct answer
 function showCorrectAnswer() {
   const currentQuestion = quizQuestions[currentQuestionIndex];
 
@@ -372,7 +382,7 @@ nextButton.addEventListener("click", function () {
   }
 });
 
-// Show Result
+// Show Result + High Score System
 function showResult() {
   clearInterval(timerInterval);
 
@@ -380,12 +390,24 @@ function showResult() {
   resultScreen.style.display = "block";
 
   const totalQuestions = quizQuestions.length;
+
   const percentage = Math.round((score / totalQuestions) * 100);
 
   finalScoreElement.textContent = `Your Score: ${score} / ${totalQuestions}`;
 
   percentageElement.textContent = `Percentage: ${percentage}%`;
 
+  // Update best score if current score is higher
+  if (score > bestScore) {
+    bestScore = score;
+
+    localStorage.setItem("quizBestScore", String(bestScore));
+  }
+
+  // Display best score
+  bestScoreElement.textContent = `Best Score: ${bestScore}`;
+
+  // Performance message
   if (percentage === 100) {
     performanceElement.textContent = "Excellent! Perfect score!";
   } else if (percentage >= 70) {
@@ -399,7 +421,6 @@ function showResult() {
 
 // Back to Setup
 backButton.addEventListener("click", function () {
-  // Stop the running timer
   clearInterval(timerInterval);
 
   // Reset quiz state
@@ -417,17 +438,16 @@ backButton.addEventListener("click", function () {
   setupScreen.style.display = "block";
   introText.style.display = "block";
 
-  // Clear old question information
+  // Clear previous question
   optionsElement.innerHTML = "";
   questionElement.textContent = "";
   progressElement.textContent = "";
   quizCategoryElement.textContent = "";
 
-  // Reset progress bar and timer
+  // Reset progress and timer
   progressFill.style.width = "0%";
   timerElement.textContent = "Time: 15s";
 
-  // Hide Next Question button
   nextButton.style.display = "none";
 });
 
