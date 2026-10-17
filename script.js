@@ -181,13 +181,29 @@ let timeLeft = 15;
 let timerInterval = null;
 let answered = false;
 
+// Shuffle Questions
+function shuffleQuestions(array) {
+  const shuffledArray = [...array];
+
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    const randomIndex = Math.floor(Math.random() * (i + 1));
+
+    [shuffledArray[i], shuffledArray[randomIndex]] = [
+      shuffledArray[randomIndex],
+      shuffledArray[i],
+    ];
+  }
+
+  return shuffledArray;
+}
+
 // Start Quiz
 startButton.addEventListener("click", function () {
   const selectedCategory = categorySelect.value;
   const selectedDifficulty = difficultySelect.value;
 
-  // Filter questions by category and difficulty
-  currentQuestions = questions.filter(function (question) {
+  // Filter by category and difficulty
+  const filteredQuestions = questions.filter(function (question) {
     const categoryMatches =
       selectedCategory === "All" || question.category === selectedCategory;
 
@@ -198,10 +214,13 @@ startButton.addEventListener("click", function () {
     return categoryMatches && difficultyMatches;
   });
 
-  if (currentQuestions.length === 0) {
+  if (filteredQuestions.length === 0) {
     alert("No questions available for this selection.");
     return;
   }
+
+  // Shuffle the selected questions
+  currentQuestions = shuffleQuestions(filteredQuestions);
 
   currentQuestionIndex = 0;
   score = 0;
@@ -241,7 +260,10 @@ function showQuestion() {
   nextButton.style.display = "none";
   restartButton.style.display = "none";
 
-  currentQuestion.options.forEach(function (option) {
+  // Shuffle answer options too
+  const shuffledOptions = shuffleQuestions(currentQuestion.options);
+
+  shuffledOptions.forEach(function (option) {
     const button = document.createElement("button");
 
     button.textContent = option;
@@ -364,7 +386,7 @@ function showResult() {
   restartButton.style.display = "block";
 }
 
-// Return to Quiz Setup
+// Return to Setup Screen
 restartButton.addEventListener("click", function () {
   clearInterval(timerInterval);
 
@@ -382,6 +404,5 @@ restartButton.addEventListener("click", function () {
   progressFill.style.width = "0%";
   timerElement.textContent = "Time: 15s";
   quizCategoryElement.textContent = "";
-
   questionElement.textContent = "";
 });
