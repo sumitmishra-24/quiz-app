@@ -1,24 +1,30 @@
-const startButton = document.getElementById("start-btn");
 const setupScreen = document.getElementById("setup-screen");
 const quizScreen = document.getElementById("quiz-screen");
+const resultScreen = document.getElementById("result-screen");
+
+const introText = document.getElementById("intro-text");
 
 const categorySelect = document.getElementById("category");
 const difficultySelect = document.getElementById("difficulty");
 
-const questionElement = document.getElementById("question");
-const optionsElement = document.getElementById("options");
-
+const startButton = document.getElementById("start-btn");
+const backButton = document.getElementById("back-btn");
 const nextButton = document.getElementById("next-btn");
 const restartButton = document.getElementById("restart-btn");
 
-const progressElement = document.getElementById("progress");
-const progressFill = document.getElementById("progress-fill");
+const questionElement = document.getElementById("question");
+const optionsElement = document.getElementById("options");
 
 const timerElement = document.getElementById("timer");
+const progressElement = document.getElementById("progress");
+const progressFill = document.getElementById("progress-fill");
 const quizCategoryElement = document.getElementById("quiz-category");
-const introText = document.getElementById("intro-text");
 
-// Questions database
+const finalScoreElement = document.getElementById("final-score");
+const percentageElement = document.getElementById("percentage");
+const performanceElement = document.getElementById("performance");
+
+// Quiz Questions
 const questions = [
   // HTML - Easy
   {
@@ -27,7 +33,8 @@ const questions = [
     question: "What does HTML stand for?",
     options: [
       "Hyper Text Markup Language",
-      "High Tech Modern Language",
+      "High Text Machine Language",
+      "Hyperlinks Text Mark Language",
       "Home Tool Markup Language",
     ],
     answer: "Hyper Text Markup Language",
@@ -35,25 +42,25 @@ const questions = [
   {
     category: "HTML",
     difficulty: "Easy",
-    question: "Which tag creates a paragraph?",
-    options: ["<h1>", "<p>", "<div>"],
-    answer: "<p>",
+    question: "Which tag is used for the largest heading?",
+    options: ["<h6>", "<head>", "<h1>", "<heading>"],
+    answer: "<h1>",
   },
 
   // HTML - Medium
   {
     category: "HTML",
     difficulty: "Medium",
-    question: "Which HTML tag creates a hyperlink?",
-    options: ["<link>", "<a>", "<href>"],
-    answer: "<a>",
+    question: "Which attribute provides alternative text for an image?",
+    options: ["src", "alt", "title", "href"],
+    answer: "alt",
   },
   {
     category: "HTML",
     difficulty: "Medium",
-    question: "Which attribute provides alternative text for an image?",
-    options: ["title", "src", "alt"],
-    answer: "alt",
+    question: "Which HTML element is used to create a dropdown list?",
+    options: ["<input>", "<list>", "<select>", "<dropdown>"],
+    answer: "<select>",
   },
 
   // HTML - Hard
@@ -61,14 +68,14 @@ const questions = [
     category: "HTML",
     difficulty: "Hard",
     question: "Which attribute connects a label to a form input?",
-    options: ["name", "for", "class"],
+    options: ["name", "for", "target", "rel"],
     answer: "for",
   },
   {
     category: "HTML",
     difficulty: "Hard",
     question: "Which attribute makes an input field mandatory?",
-    options: ["required", "validate", "mandatory"],
+    options: ["validate", "required", "mandatory", "checked"],
     answer: "required",
   },
 
@@ -77,14 +84,14 @@ const questions = [
     category: "CSS",
     difficulty: "Easy",
     question: "Which CSS property changes text color?",
-    options: ["background", "font-size", "color"],
+    options: ["font-style", "background", "color", "text-size"],
     answer: "color",
   },
   {
     category: "CSS",
     difficulty: "Easy",
-    question: "Which symbol is used to select a class?",
-    options: ["#", ".", "*"],
+    question: "Which symbol is used to select a class in CSS?",
+    options: ["#", ".", "*", "&"],
     answer: ".",
   },
 
@@ -92,16 +99,17 @@ const questions = [
   {
     category: "CSS",
     difficulty: "Medium",
-    question: "Which CSS layout system uses rows and columns?",
-    options: ["Flexbox", "Grid", "Float"],
-    answer: "Grid",
+    question: "Which property creates space inside an element's border?",
+    options: ["margin", "padding", "spacing", "gap"],
+    answer: "padding",
   },
   {
     category: "CSS",
     difficulty: "Medium",
-    question: "Which property controls space inside an element?",
-    options: ["margin", "padding", "border"],
-    answer: "padding",
+    question:
+      "Which CSS layout system is designed for one-dimensional layouts?",
+    options: ["Flexbox", "Float", "Position", "Table"],
+    answer: "Flexbox",
   },
 
   // CSS - Hard
@@ -109,92 +117,102 @@ const questions = [
     category: "CSS",
     difficulty: "Hard",
     question: "Which selector has the highest specificity?",
-    options: ["Element selector", "Class selector", "ID selector"],
+    options: [
+      "Element selector",
+      "Class selector",
+      "ID selector",
+      "Universal selector",
+    ],
     answer: "ID selector",
   },
   {
     category: "CSS",
     difficulty: "Hard",
-    question: "Which CSS unit is relative to the root font size?",
-    options: ["px", "em", "rem"],
-    answer: "rem",
+    question:
+      "Which property controls how an element behaves when content overflows?",
+    options: ["display", "overflow", "position", "visibility"],
+    answer: "overflow",
   },
 
   // JavaScript - Easy
   {
     category: "JavaScript",
     difficulty: "Easy",
-    question: "Which keyword declares a block-scoped variable?",
-    options: ["let", "print", "define"],
+    question:
+      "Which keyword declares a block-scoped variable that can be reassigned?",
+    options: ["const", "let", "static", "define"],
     answer: "let",
   },
   {
     category: "JavaScript",
     difficulty: "Easy",
-    question: "Which symbol is commonly used for strict equality?",
-    options: ["=", "===", "!="],
-    answer: "===",
+    question: "Which method displays a message in the browser console?",
+    options: ["console.log()", "print()", "display()", "message()"],
+    answer: "console.log()",
   },
 
   // JavaScript - Medium
   {
     category: "JavaScript",
     difficulty: "Medium",
-    question: "Which method adds an item to the end of an array?",
-    options: ["pop()", "push()", "shift()"],
+    question: "Which array method adds an item to the end of an array?",
+    options: ["pop()", "shift()", "push()", "slice()"],
     answer: "push()",
   },
   {
     category: "JavaScript",
     difficulty: "Medium",
-    question:
-      "Which array method creates a new array by transforming elements?",
-    options: ["map()", "find()", "forEach()"],
-    answer: "map()",
+    question: "Which operator checks strict equality?",
+    options: ["=", "==", "===", "!="],
+    answer: "===",
   },
 
   // JavaScript - Hard
   {
     category: "JavaScript",
     difficulty: "Hard",
-    question: "Which method creates a new array containing matching elements?",
-    options: ["map()", "filter()", "forEach()"],
-    answer: "filter()",
+    question: "What does Array.prototype.map() return?",
+    options: [
+      "The original array only",
+      "A new array",
+      "A number",
+      "Always undefined",
+    ],
+    answer: "A new array",
   },
   {
     category: "JavaScript",
     difficulty: "Hard",
-    question: "What does a Promise represent in JavaScript?",
+    question: "Which method converts a JSON string into a JavaScript value?",
     options: [
-      "A CSS animation",
-      "An eventual result of an asynchronous operation",
-      "A type of loop",
+      "JSON.stringify()",
+      "JSON.parse()",
+      "JSON.convert()",
+      "JSON.decode()",
     ],
-    answer: "An eventual result of an asynchronous operation",
+    answer: "JSON.parse()",
   },
 ];
 
-let currentQuestions = [];
+// Quiz State
+let quizQuestions = [];
 let currentQuestionIndex = 0;
 let score = 0;
 let timeLeft = 15;
 let timerInterval = null;
 let answered = false;
 
-// Shuffle Questions
+// Shuffle array using Fisher-Yates algorithm
 function shuffleQuestions(array) {
-  const shuffledArray = [...array];
+  const shuffled = [...array];
 
-  for (let i = shuffledArray.length - 1; i > 0; i--) {
+  for (let i = shuffled.length - 1; i > 0; i--) {
     const randomIndex = Math.floor(Math.random() * (i + 1));
 
-    [shuffledArray[i], shuffledArray[randomIndex]] = [
-      shuffledArray[randomIndex],
-      shuffledArray[i],
-    ];
+    [shuffled[i], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[i]];
   }
 
-  return shuffledArray;
+  return shuffled;
 }
 
 // Start Quiz
@@ -202,16 +220,11 @@ startButton.addEventListener("click", function () {
   const selectedCategory = categorySelect.value;
   const selectedDifficulty = difficultySelect.value;
 
-  // Filter by category and difficulty
   const filteredQuestions = questions.filter(function (question) {
-    const categoryMatches =
-      selectedCategory === "All" || question.category === selectedCategory;
-
-    const difficultyMatches =
-      selectedDifficulty === "All" ||
-      question.difficulty === selectedDifficulty;
-
-    return categoryMatches && difficultyMatches;
+    return (
+      question.category === selectedCategory &&
+      question.difficulty === selectedDifficulty
+    );
   });
 
   if (filteredQuestions.length === 0) {
@@ -219,83 +232,57 @@ startButton.addEventListener("click", function () {
     return;
   }
 
-  // Shuffle the selected questions
-  currentQuestions = shuffleQuestions(filteredQuestions);
+  quizQuestions = shuffleQuestions(filteredQuestions);
 
   currentQuestionIndex = 0;
   score = 0;
 
   setupScreen.style.display = "none";
-  introText.style.display = "none";
+  resultScreen.style.display = "none";
   quizScreen.style.display = "block";
 
-  showQuestion();
+  introText.style.display = "none";
+
+  quizCategoryElement.textContent = `${selectedCategory} - ${selectedDifficulty}`;
+
+  loadQuestion();
 });
 
-// Update Progress Bar
-function updateProgress() {
-  const percentage =
-    ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
-
-  progressFill.style.width = `${percentage}%`;
-}
-
-// Display Question
-function showQuestion() {
+// Load Question
+function loadQuestion() {
   clearInterval(timerInterval);
 
-  const currentQuestion = currentQuestions[currentQuestionIndex];
-
   answered = false;
+  timeLeft = 15;
+
+  const currentQuestion = quizQuestions[currentQuestionIndex];
 
   questionElement.textContent = currentQuestion.question;
 
-  progressElement.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
+  progressElement.textContent = `Question ${currentQuestionIndex + 1} of ${quizQuestions.length}`;
 
-  quizCategoryElement.textContent = `${currentQuestion.category} | ${currentQuestion.difficulty}`;
+  const progressPercentage =
+    (currentQuestionIndex / quizQuestions.length) * 100;
 
-  updateProgress();
+  progressFill.style.width = `${progressPercentage}%`;
+
+  timerElement.textContent = `Time: ${timeLeft}s`;
 
   optionsElement.innerHTML = "";
-  nextButton.style.display = "none";
-  restartButton.style.display = "none";
 
-  // Shuffle answer options too
+  nextButton.style.display = "none";
+
+  // Shuffle answer options
   const shuffledOptions = shuffleQuestions(currentQuestion.options);
 
   shuffledOptions.forEach(function (option) {
     const button = document.createElement("button");
 
     button.textContent = option;
+    button.classList.add("option-btn");
 
     button.addEventListener("click", function () {
-      if (answered || timeLeft <= 0) {
-        return;
-      }
-
-      answered = true;
-      clearInterval(timerInterval);
-
-      const allButtons = optionsElement.querySelectorAll("button");
-
-      allButtons.forEach(function (btn) {
-        btn.disabled = true;
-      });
-
-      if (option === currentQuestion.answer) {
-        button.style.backgroundColor = "green";
-        score++;
-      } else {
-        button.style.backgroundColor = "red";
-
-        allButtons.forEach(function (btn) {
-          if (btn.textContent === currentQuestion.answer) {
-            btn.style.backgroundColor = "green";
-          }
-        });
-      }
-
-      nextButton.style.display = "block";
+      selectAnswer(button, option);
     });
 
     optionsElement.appendChild(button);
@@ -308,9 +295,6 @@ function showQuestion() {
 function startTimer() {
   clearInterval(timerInterval);
 
-  timeLeft = 15;
-  timerElement.textContent = `Time: ${timeLeft}s`;
-
   timerInterval = setInterval(function () {
     timeLeft--;
 
@@ -318,91 +302,152 @@ function startTimer() {
 
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
+      timeLeft = 0;
+      timerElement.textContent = "Time's up!";
 
-      answered = true;
-
-      const allButtons = optionsElement.querySelectorAll("button");
-
-      allButtons.forEach(function (button) {
-        button.disabled = true;
-
-        if (
-          button.textContent === currentQuestions[currentQuestionIndex].answer
-        ) {
-          button.style.backgroundColor = "green";
-        }
-      });
-
-      nextButton.style.display = "block";
+      if (!answered) {
+        answered = true;
+        disableOptions();
+        showCorrectAnswer();
+        nextButton.style.display = "block";
+      }
     }
   }, 1000);
 }
 
-// Next Question
-nextButton.addEventListener("click", function () {
+// Select Answer
+function selectAnswer(selectedButton, selectedOption) {
+  if (answered) {
+    return;
+  }
+
+  answered = true;
   clearInterval(timerInterval);
 
+  const currentQuestion = quizQuestions[currentQuestionIndex];
+
+  if (selectedOption === currentQuestion.answer) {
+    score++;
+    selectedButton.classList.add("correct");
+  } else {
+    selectedButton.classList.add("incorrect");
+    showCorrectAnswer();
+  }
+
+  disableOptions();
+
+  nextButton.style.display = "block";
+}
+
+// Disable all answer options
+function disableOptions() {
+  const optionButtons = optionsElement.querySelectorAll(".option-btn");
+
+  optionButtons.forEach(function (button) {
+    button.disabled = true;
+  });
+}
+
+// Highlight the correct answer
+function showCorrectAnswer() {
+  const currentQuestion = quizQuestions[currentQuestionIndex];
+
+  const optionButtons = optionsElement.querySelectorAll(".option-btn");
+
+  optionButtons.forEach(function (button) {
+    if (button.textContent === currentQuestion.answer) {
+      button.classList.add("correct");
+    }
+  });
+}
+
+// Next Question
+nextButton.addEventListener("click", function () {
   currentQuestionIndex++;
 
-  if (currentQuestionIndex < currentQuestions.length) {
-    showQuestion();
+  if (currentQuestionIndex < quizQuestions.length) {
+    loadQuestion();
   } else {
     showResult();
   }
 });
 
-// Show Final Result
+// Show Result
 function showResult() {
   clearInterval(timerInterval);
 
-  questionElement.textContent = "Quiz Completed!";
-  progressElement.textContent = "Quiz Finished!";
-  quizCategoryElement.textContent = "";
-  timerElement.textContent = "";
+  quizScreen.style.display = "none";
+  resultScreen.style.display = "block";
 
-  progressFill.style.width = "100%";
+  const totalQuestions = quizQuestions.length;
+  const percentage = Math.round((score / totalQuestions) * 100);
 
-  const percentage = Math.round((score / currentQuestions.length) * 100);
+  finalScoreElement.textContent = `Your Score: ${score} / ${totalQuestions}`;
 
-  let message;
+  percentageElement.textContent = `Percentage: ${percentage}%`;
 
-  if (percentage >= 80) {
-    message = "Excellent! 🏆";
-  } else if (percentage >= 60) {
-    message = "Good Job! 🎉";
+  if (percentage === 100) {
+    performanceElement.textContent = "Excellent! Perfect score!";
+  } else if (percentage >= 70) {
+    performanceElement.textContent = "Great job! You did really well.";
   } else if (percentage >= 40) {
-    message = "Not Bad! 👍";
+    performanceElement.textContent = "Good effort! Keep practicing.";
   } else {
-    message = "Keep Practicing! 💪";
+    performanceElement.textContent = "Keep learning! You will improve.";
   }
-
-  optionsElement.innerHTML = `
-    <h3>Your Score: ${score} / ${currentQuestions.length}</h3>
-    <h3>Percentage: ${percentage}%</h3>
-    <h3>${message}</h3>
-  `;
-
-  nextButton.style.display = "none";
-  restartButton.style.display = "block";
 }
 
-// Return to Setup Screen
-restartButton.addEventListener("click", function () {
+// Back to Setup
+backButton.addEventListener("click", function () {
+  // Stop the running timer
   clearInterval(timerInterval);
 
+  // Reset quiz state
   currentQuestionIndex = 0;
   score = 0;
   timeLeft = 15;
   answered = false;
+  quizQuestions = [];
+
+  // Hide quiz and result screens
+  quizScreen.style.display = "none";
+  resultScreen.style.display = "none";
+
+  // Show setup screen
+  setupScreen.style.display = "block";
+  introText.style.display = "block";
+
+  // Clear old question information
+  optionsElement.innerHTML = "";
+  questionElement.textContent = "";
+  progressElement.textContent = "";
+  quizCategoryElement.textContent = "";
+
+  // Reset progress bar and timer
+  progressFill.style.width = "0%";
+  timerElement.textContent = "Time: 15s";
+
+  // Hide Next Question button
+  nextButton.style.display = "none";
+});
+
+// Choose Again
+restartButton.addEventListener("click", function () {
+  clearInterval(timerInterval);
 
   quizScreen.style.display = "none";
+  resultScreen.style.display = "none";
+
   setupScreen.style.display = "block";
   introText.style.display = "block";
 
   optionsElement.innerHTML = "";
+  questionElement.textContent = "";
   progressElement.textContent = "";
+  quizCategoryElement.textContent = "";
+
   progressFill.style.width = "0%";
   timerElement.textContent = "Time: 15s";
-  quizCategoryElement.textContent = "";
-  questionElement.textContent = "";
+
+  nextButton.style.display = "none";
 });
