@@ -416,3 +416,31 @@ button:disabled {
     padding: 9px 11px;
   }
 }
+
+/* Quiz background image */
+body {
+  background-image: url("./quiz-background.jpeg");
+  background-repeat: repeat;
+  background-size: 400px auto;
+  background-position: top left;
+  background-attachment: fixed;
+}
+
+/* Keep the background image visible in both themes */
+body.dark-mode {
+  background-image: url("./quiz-background.jpeg");
+}
+
+/* Fix form labels and their backgrounds */
+label {
+  background: transparent;
+}
+
+/* Keep the background image behind the content */
+#setup-screen,
+#quiz-screen,
+#result-screen,
+#history-screen {
+  position: relative;
+  z-index: 1;
+}
