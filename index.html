@@ -3,17 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Quiz Master</title>
+
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="container">
       <h1>Quiz Master</h1>
+
       <p id="intro-text">Test your knowledge and challenge yourself!</p>
 
       <!-- Setup Screen -->
       <section id="setup-screen">
         <label for="category">Choose Category</label>
+
         <select id="category">
           <option value="HTML">HTML</option>
           <option value="CSS">CSS</option>
@@ -21,6 +25,7 @@
         </select>
 
         <label for="difficulty">Choose Difficulty</label>
+
         <select id="difficulty">
           <option value="Easy">Easy</option>
           <option value="Medium">Medium</option>
@@ -39,6 +44,7 @@
 
         <div class="progress-info">
           <span id="progress"></span>
+
           <div class="progress-bar">
             <div id="progress-fill"></div>
           </div>
@@ -60,11 +66,23 @@
         <h2>Quiz Completed!</h2>
 
         <p id="final-score"></p>
+
         <p id="percentage"></p>
+
         <p id="performance"></p>
+
         <p id="best-score"></p>
 
         <button id="restart-btn">Choose Again</button>
+      </section>
+
+      <!-- Quiz History Screen -->
+      <section id="history-screen" style="display: none">
+        <h2>Quiz History</h2>
+
+        <div id="history-list"></div>
+
+        <button id="back-to-setup-btn">Back to Setup</button>
       </section>
     </div>
 

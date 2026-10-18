@@ -1,6 +1,7 @@
 const setupScreen = document.getElementById("setup-screen");
 const quizScreen = document.getElementById("quiz-screen");
 const resultScreen = document.getElementById("result-screen");
+const historyScreen = document.getElementById("history-screen");
 
 const introText = document.getElementById("intro-text");
 
@@ -11,6 +12,8 @@ const startButton = document.getElementById("start-btn");
 const backButton = document.getElementById("back-btn");
 const nextButton = document.getElementById("next-btn");
 const restartButton = document.getElementById("restart-btn");
+
+const backToSetupButton = document.getElementById("back-to-setup-btn");
 
 const questionElement = document.getElementById("question");
 const optionsElement = document.getElementById("options");
@@ -24,6 +27,8 @@ const finalScoreElement = document.getElementById("final-score");
 const percentageElement = document.getElementById("percentage");
 const performanceElement = document.getElementById("performance");
 const bestScoreElement = document.getElementById("best-score");
+
+const historyList = document.getElementById("history-list");
 
 // Quiz Questions
 const questions = [
@@ -203,10 +208,25 @@ let timeLeft = 15;
 let timerInterval = null;
 let answered = false;
 
-// Load saved best score
+let selectedCategory = "";
+let selectedDifficulty = "";
+
+// Load saved data
 let bestScore = Number(localStorage.getItem("quizBestScore")) || 0;
 
-// Shuffle array using Fisher-Yates algorithm
+let quizHistory = [];
+
+try {
+  const savedHistory = JSON.parse(localStorage.getItem("quizHistory"));
+
+  if (Array.isArray(savedHistory)) {
+    quizHistory = savedHistory;
+  }
+} catch (error) {
+  quizHistory = [];
+}
+
+// Shuffle array
 function shuffleQuestions(array) {
   const shuffled = [...array];
 
@@ -221,8 +241,8 @@ function shuffleQuestions(array) {
 
 // Start Quiz
 startButton.addEventListener("click", function () {
-  const selectedCategory = categorySelect.value;
-  const selectedDifficulty = difficultySelect.value;
+  selectedCategory = categorySelect.value;
+  selectedDifficulty = difficultySelect.value;
 
   const filteredQuestions = questions.filter(function (question) {
     return (
@@ -243,6 +263,7 @@ startButton.addEventListener("click", function () {
 
   setupScreen.style.display = "none";
   resultScreen.style.display = "none";
+  historyScreen.style.display = "none";
   quizScreen.style.display = "block";
 
   introText.style.display = "none";
@@ -273,10 +294,8 @@ function loadQuestion() {
   timerElement.textContent = `Time: ${timeLeft}s`;
 
   optionsElement.innerHTML = "";
-
   nextButton.style.display = "none";
 
-  // Shuffle answer options
   const shuffledOptions = shuffleQuestions(currentQuestion.options);
 
   shuffledOptions.forEach(function (option) {
@@ -336,11 +355,9 @@ function selectAnswer(selectedButton, selectedOption) {
 
   if (selectedOption === currentQuestion.answer) {
     score++;
-
     selectedButton.classList.add("correct");
   } else {
     selectedButton.classList.add("incorrect");
-
     showCorrectAnswer();
   }
 
@@ -349,7 +366,7 @@ function selectAnswer(selectedButton, selectedOption) {
   nextButton.style.display = "block";
 }
 
-// Disable all answer options
+// Disable options
 function disableOptions() {
   const optionButtons = optionsElement.querySelectorAll(".option-btn");
 
@@ -358,7 +375,7 @@ function disableOptions() {
   });
 }
 
-// Highlight correct answer
+// Show correct answer
 function showCorrectAnswer() {
   const currentQuestion = quizQuestions[currentQuestionIndex];
 
@@ -382,7 +399,7 @@ nextButton.addEventListener("click", function () {
   }
 });
 
-// Show Result + High Score System
+// Show Result and Save History
 function showResult() {
   clearInterval(timerInterval);
 
@@ -397,14 +414,13 @@ function showResult() {
 
   percentageElement.textContent = `Percentage: ${percentage}%`;
 
-  // Update best score if current score is higher
+  // Update best score
   if (score > bestScore) {
     bestScore = score;
 
     localStorage.setItem("quizBestScore", String(bestScore));
   }
 
-  // Display best score
   bestScoreElement.textContent = `Best Score: ${bestScore}`;
 
   // Performance message
@@ -417,38 +433,118 @@ function showResult() {
   } else {
     performanceElement.textContent = "Keep learning! You will improve.";
   }
+
+  // Create a history record
+  const historyRecord = {
+    category: selectedCategory,
+    difficulty: selectedDifficulty,
+    score: score,
+    totalQuestions: totalQuestions,
+    percentage: percentage,
+    date: new Date().toLocaleString(),
+  };
+
+  // Add newest result at the beginning
+  quizHistory.unshift(historyRecord);
+
+  // Save history in localStorage
+  try {
+    localStorage.setItem("quizHistory", JSON.stringify(quizHistory));
+  } catch (error) {
+    console.error("Unable to save quiz history:", error);
+  }
 }
 
-// Back to Setup
+// Display Quiz History
+function displayHistory() {
+  historyList.innerHTML = "";
+
+  if (quizHistory.length === 0) {
+    const message = document.createElement("p");
+
+    message.textContent = "No quiz history available yet.";
+
+    historyList.appendChild(message);
+    return;
+  }
+
+  quizHistory.forEach(function (record) {
+    const historyCard = document.createElement("div");
+
+    historyCard.classList.add("history-card");
+
+    const title = document.createElement("h3");
+    title.textContent = `${record.category} - ${record.difficulty}`;
+
+    const scoreText = document.createElement("p");
+    scoreText.textContent = `Score: ${record.score}/${record.totalQuestions}`;
+
+    const percentageText = document.createElement("p");
+    percentageText.textContent = `Percentage: ${record.percentage}%`;
+
+    const dateText = document.createElement("p");
+    dateText.textContent = `Date: ${record.date}`;
+
+    historyCard.appendChild(title);
+    historyCard.appendChild(scoreText);
+    historyCard.appendChild(percentageText);
+    historyCard.appendChild(dateText);
+
+    historyList.appendChild(historyCard);
+  });
+}
+
+// Create and show View History button on result screen
+const viewHistoryButton = document.createElement("button");
+
+viewHistoryButton.id = "view-history-btn";
+viewHistoryButton.textContent = "View Quiz History";
+
+resultScreen.appendChild(viewHistoryButton);
+
+viewHistoryButton.addEventListener("click", function () {
+  resultScreen.style.display = "none";
+  historyScreen.style.display = "block";
+
+  displayHistory();
+});
+
+// Back to Setup from Quiz
 backButton.addEventListener("click", function () {
   clearInterval(timerInterval);
 
-  // Reset quiz state
   currentQuestionIndex = 0;
   score = 0;
   timeLeft = 15;
   answered = false;
   quizQuestions = [];
 
-  // Hide quiz and result screens
   quizScreen.style.display = "none";
   resultScreen.style.display = "none";
+  historyScreen.style.display = "none";
 
-  // Show setup screen
   setupScreen.style.display = "block";
   introText.style.display = "block";
 
-  // Clear previous question
   optionsElement.innerHTML = "";
   questionElement.textContent = "";
   progressElement.textContent = "";
   quizCategoryElement.textContent = "";
 
-  // Reset progress and timer
   progressFill.style.width = "0%";
   timerElement.textContent = "Time: 15s";
 
   nextButton.style.display = "none";
+});
+
+// Back to Setup from History
+backToSetupButton.addEventListener("click", function () {
+  historyScreen.style.display = "none";
+  resultScreen.style.display = "none";
+  quizScreen.style.display = "none";
+
+  setupScreen.style.display = "block";
+  introText.style.display = "block";
 });
 
 // Choose Again
@@ -457,6 +553,7 @@ restartButton.addEventListener("click", function () {
 
   quizScreen.style.display = "none";
   resultScreen.style.display = "none";
+  historyScreen.style.display = "none";
 
   setupScreen.style.display = "block";
   introText.style.display = "block";
