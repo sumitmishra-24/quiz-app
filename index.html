@@ -20,12 +20,16 @@
           <button id="sound-btn" class="utility-btn" type="button">
             🔊 Sound On
           </button>
+
+          <button id="rules-btn" class="utility-btn" type="button">
+            📋 Quiz Rules
+          </button>
         </div>
       </header>
 
       <p id="intro-text">Test your knowledge and challenge yourself!</p>
 
-      <!-- Setup Screen -->
+      <!-- QUIZ SETUP -->
       <section id="setup-screen">
         <label for="category">Choose Category</label>
 
@@ -45,10 +49,12 @@
           <option value="Hard">Hard</option>
         </select>
 
-        <button id="start-btn" class="full-width-btn">Start Quiz</button>
+        <button id="start-btn" class="full-width-btn" type="button">
+          Start Quiz
+        </button>
       </section>
 
-      <!-- Quiz Screen --->
+      <!-- QUIZ SCREEN -->
       <section id="quiz-screen" style="display: none">
         <div class="quiz-info">
           <span id="quiz-category"></span>
@@ -68,13 +74,17 @@
         <div id="options"></div>
 
         <div class="button-group">
-          <button id="back-btn" class="secondary-btn">Back to Setup</button>
+          <button id="back-btn" class="secondary-btn" type="button">
+            Back to Setup
+          </button>
 
-          <button id="next-btn" style="display: none">Next Question</button>
+          <button id="next-btn" type="button" style="display: none">
+            Next Question
+          </button>
         </div>
       </section>
 
-      <!-- Result Screen -->
+      <!-- RESULT SCREEN -->
       <section id="result-screen" style="display: none">
         <h2>Quiz Completed!</h2>
 
@@ -83,23 +93,110 @@
         <p id="performance"></p>
         <p id="best-score"></p>
 
-        <button id="restart-btn" class="full-width-btn">Choose Again</button>
+        <button id="restart-btn" class="full-width-btn" type="button">
+          Choose Again
+        </button>
 
-        <button id="view-history-btn" class="full-width-btn secondary-btn">
+        <button
+          id="view-history-btn"
+          class="full-width-btn secondary-btn"
+          type="button"
+        >
           View Quiz History
         </button>
       </section>
 
-      <!-- Quiz History Screen -->
+      <!-- QUIZ HISTORY -->
       <section id="history-screen" style="display: none">
         <h2>Quiz History</h2>
 
         <div id="history-list"></div>
 
-        <button id="back-to-setup-btn" class="full-width-btn">
+        <button id="back-to-setup-btn" class="full-width-btn" type="button">
           Back to Setup
         </button>
       </section>
+    </div>
+
+    <!-- QUIZ RULES MODAL -->
+    <div
+      id="rules-modal"
+      class="rules-modal"
+      style="display: none"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="rules-title"
+    >
+      <div class="rules-content">
+        <button
+          id="close-rules-btn"
+          class="close-rules-btn"
+          type="button"
+          aria-label="Close rules"
+        >
+          &times;
+        </button>
+
+        <h2 id="rules-title">📋 Quiz Master Rules</h2>
+
+        <p class="rules-subtitle">
+          Read the instructions before starting your quiz!
+        </p>
+
+        <div class="rules-list">
+          <div class="rule-item">
+            <h3>🎯 1. Quiz Overview</h3>
+            <ul>
+              <li>The question bank contains 50 questions.</li>
+              <li>Questions cover HTML, CSS and JavaScript.</li>
+              <li>Each question has a 15-second time limit.</li>
+            </ul>
+          </div>
+
+          <div class="rule-item">
+            <h3>📚 2. Categories & Difficulty</h3>
+            <ul>
+              <li>Select a category to practise a specific topic.</li>
+              <li>
+                Choose All Difficulties to include every difficulty level.
+              </li>
+              <li>Questions and answer options appear in random order.</li>
+            </ul>
+          </div>
+
+          <div class="rule-item">
+            <h3>✅ 3. Answering Rules</h3>
+            <ul>
+              <li>Each question has four answer options.</li>
+              <li>Each correct answer earns one point.</li>
+              <li>You cannot change your answer after selecting it.</li>
+              <li>If time runs out, the correct answer is revealed.</li>
+            </ul>
+          </div>
+
+          <div class="rule-item">
+            <h3>🏆 4. Scores & History</h3>
+            <ul>
+              <li>Your final score and percentage appear at the end.</li>
+              <li>Your best score is saved in your browser.</li>
+              <li>You can view previous attempts in Quiz History.</li>
+            </ul>
+          </div>
+
+          <div class="rule-item">
+            <h3>⚙️ 5. Additional Features</h3>
+            <ul>
+              <li>Switch between Light Mode and Dark Mode.</li>
+              <li>Turn sound effects on or off.</li>
+              <li>Use Back to Setup to leave an ongoing quiz.</li>
+            </ul>
+          </div>
+        </div>
+
+        <button id="got-it-btn" class="full-width-btn" type="button">
+          Got It, Let's Start!
+        </button>
+      </div>
     </div>
 
     <script src="script.js"></script>

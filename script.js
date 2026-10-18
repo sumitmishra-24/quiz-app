@@ -1245,3 +1245,64 @@ setupScreen.style.display = "block";
 console.log("Quiz Master loaded successfully!");
 
 console.log("Total questions available:", questions.length);
+
+// =====================================
+// QUIZ RULES MODAL
+// =====================================
+
+const rulesButton = document.getElementById("rules-btn");
+const rulesModal = document.getElementById("rules-modal");
+const closeRulesButton = document.getElementById("close-rules-btn");
+const gotItButton = document.getElementById("got-it-btn");
+
+function openRulesModal() {
+  if (!rulesModal) return;
+
+  rulesModal.style.display = "flex";
+
+  if (closeRulesButton) {
+    closeRulesButton.focus();
+  }
+}
+
+function closeRulesModal() {
+  if (!rulesModal) return;
+
+  rulesModal.style.display = "none";
+
+  if (rulesButton) {
+    rulesButton.focus();
+  }
+}
+
+if (rulesButton) {
+  rulesButton.addEventListener("click", openRulesModal);
+}
+
+if (closeRulesButton) {
+  closeRulesButton.addEventListener("click", closeRulesModal);
+}
+
+if (gotItButton) {
+  gotItButton.addEventListener("click", closeRulesModal);
+}
+
+// Close when clicking outside the popup.
+if (rulesModal) {
+  rulesModal.addEventListener("click", function (event) {
+    if (event.target === rulesModal) {
+      closeRulesModal();
+    }
+  });
+}
+
+// Close using Escape.
+document.addEventListener("keydown", function (event) {
+  if (
+    event.key === "Escape" &&
+    rulesModal &&
+    rulesModal.style.display !== "none"
+  ) {
+    closeRulesModal();
+  }
+});

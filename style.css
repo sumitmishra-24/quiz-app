@@ -444,3 +444,202 @@ label {
   position: relative;
   z-index: 1;
 }
+
+/* =====================================
+   QUIZ RULES BUTTON
+===================================== */
+
+#rules-btn {
+  white-space: nowrap;
+}
+
+/* =====================================
+   QUIZ RULES MODAL
+===================================== */
+
+.rules-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.rules-content {
+  position: relative;
+
+  width: 100%;
+  max-width: 620px;
+  max-height: 85vh;
+
+  overflow-y: auto;
+
+  padding: 30px;
+
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+
+  background: var(--card-bg);
+  color: var(--text-primary);
+
+  box-shadow: 0 20px 60px var(--shadow);
+
+  animation: rulesPopupIn 0.22s ease-out;
+}
+
+@keyframes rulesPopupIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rules-content > h2 {
+  margin: 0 35px 8px 0;
+
+  color: var(--primary);
+  font-size: 25px;
+  line-height: 1.4;
+}
+
+.rules-subtitle {
+  margin-bottom: 22px;
+
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Close button */
+
+.close-rules-btn {
+  position: absolute;
+
+  top: 12px;
+  right: 12px;
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+
+  background: var(--option-bg);
+  color: var(--text-primary);
+
+  font-size: 27px;
+  line-height: 1;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.close-rules-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* Individual rule cards */
+
+.rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rule-item {
+  padding: 16px;
+
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+
+  background: var(--option-bg);
+}
+
+.rule-item h3 {
+  margin: 0 0 10px;
+
+  color: var(--primary);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.rule-item ul {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.rule-item li {
+  margin: 8px 0;
+
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.rules-content #got-it-btn {
+  margin-top: 20px;
+}
+
+/* Scrollbar */
+
+.rules-content::-webkit-scrollbar {
+  width: 7px;
+}
+
+.rules-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+/* Mobile responsive */
+
+@media (max-width: 480px) {
+  .rules-modal {
+    padding: 12px;
+  }
+
+  .rules-content {
+    max-height: 90vh;
+    padding: 23px 16px;
+    border-radius: 14px;
+  }
+
+  .rules-content > h2 {
+    font-size: 21px;
+  }
+
+  .rule-item {
+    padding: 12px;
+  }
+
+  .rule-item h3 {
+    font-size: 15px;
+  }
+
+  .rule-item li {
+    font-size: 13px;
+  }
+
+  .settings {
+    flex-wrap: wrap;
+  }
+}
