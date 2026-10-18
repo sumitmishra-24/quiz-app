@@ -1,5 +1,5 @@
 // =========================
-// DOM Elements
+// DOM Elements - Setup
 // =========================
 
 const setupScreen = document.getElementById("setup-screen");
