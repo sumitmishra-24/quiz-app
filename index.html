@@ -3,14 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>Quiz Master</title>
-
     <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
     <div class="container">
-      <h1>Quiz Master</h1>
+      <header class="app-header">
+        <h1>Quiz Master</h1>
+
+        <div class="settings">
+          <button id="theme-btn" class="utility-btn" type="button">
+            🌙 Dark Mode
+          </button>
+
+          <button id="sound-btn" class="utility-btn" type="button">
+            🔊 Sound On
+          </button>
+        </div>
+      </header>
 
       <p id="intro-text">Test your knowledge and challenge yourself!</p>
 
@@ -32,7 +43,7 @@
           <option value="Hard">Hard</option>
         </select>
 
-        <button id="start-btn">Start Quiz</button>
+        <button id="start-btn" class="full-width-btn">Start Quiz</button>
       </section>
 
       <!-- Quiz Screen -->
@@ -66,14 +77,15 @@
         <h2>Quiz Completed!</h2>
 
         <p id="final-score"></p>
-
         <p id="percentage"></p>
-
         <p id="performance"></p>
-
         <p id="best-score"></p>
 
-        <button id="restart-btn">Choose Again</button>
+        <button id="restart-btn" class="full-width-btn">Choose Again</button>
+
+        <button id="view-history-btn" class="full-width-btn secondary-btn">
+          View Quiz History
+        </button>
       </section>
 
       <!-- Quiz History Screen -->
@@ -82,7 +94,9 @@
 
         <div id="history-list"></div>
 
-        <button id="back-to-setup-btn">Back to Setup</button>
+        <button id="back-to-setup-btn" class="full-width-btn">
+          Back to Setup
+        </button>
       </section>
     </div>
 

@@ -1,3 +1,7 @@
+// =========================
+// DOM Elements
+// =========================
+
 const setupScreen = document.getElementById("setup-screen");
 const quizScreen = document.getElementById("quiz-screen");
 const resultScreen = document.getElementById("result-screen");
@@ -14,6 +18,7 @@ const nextButton = document.getElementById("next-btn");
 const restartButton = document.getElementById("restart-btn");
 
 const backToSetupButton = document.getElementById("back-to-setup-btn");
+const viewHistoryButton = document.getElementById("view-history-btn");
 
 const questionElement = document.getElementById("question");
 const optionsElement = document.getElementById("options");
@@ -30,7 +35,13 @@ const bestScoreElement = document.getElementById("best-score");
 
 const historyList = document.getElementById("history-list");
 
+const themeButton = document.getElementById("theme-btn");
+const soundButton = document.getElementById("sound-btn");
+
+// =========================
 // Quiz Questions
+// =========================
+
 const questions = [
   // HTML - Easy
   {
@@ -200,7 +211,10 @@ const questions = [
   },
 ];
 
+// =========================
 // Quiz State
+// =========================
+
 let quizQuestions = [];
 let currentQuestionIndex = 0;
 let score = 0;
@@ -211,13 +225,33 @@ let answered = false;
 let selectedCategory = "";
 let selectedDifficulty = "";
 
-// Load saved data
-let bestScore = Number(localStorage.getItem("quizBestScore")) || 0;
+// =========================
+// Safe Local Storage
+// =========================
+
+function getSavedValue(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value === null ? fallback : value;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function saveValue(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (error) {
+    console.warn("Could not save data:", error);
+  }
+}
+
+let bestScore = Number(getSavedValue("quizBestScore", "0")) || 0;
 
 let quizHistory = [];
 
 try {
-  const savedHistory = JSON.parse(localStorage.getItem("quizHistory"));
+  const savedHistory = JSON.parse(getSavedValue("quizHistory", "[]"));
 
   if (Array.isArray(savedHistory)) {
     quizHistory = savedHistory;
@@ -226,7 +260,144 @@ try {
   quizHistory = [];
 }
 
-// Shuffle array
+// =========================
+// Dark Mode
+// =========================
+
+function applyTheme(theme) {
+  const isDark = theme === "dark";
+
+  document.body.classList.toggle("dark-mode", isDark);
+
+  themeButton.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+
+  themeButton.setAttribute(
+    "aria-label",
+    isDark ? "Switch to light mode" : "Switch to dark mode",
+  );
+}
+
+// Restore saved theme
+const savedTheme = getSavedValue("quizTheme", "light");
+
+applyTheme(savedTheme === "dark" ? "dark" : "light");
+
+themeButton.addEventListener("click", function () {
+  const isDark = document.body.classList.contains("dark-mode");
+
+  const newTheme = isDark ? "light" : "dark";
+
+  applyTheme(newTheme);
+  saveValue("quizTheme", newTheme);
+});
+
+// =========================
+// Sound Effects
+// =========================
+
+let soundEnabled = getSavedValue("quizSound", "on") !== "off";
+let audioContext = null;
+
+function updateSoundButton() {
+  soundButton.textContent = soundEnabled ? "🔊 Sound On" : "🔇 Sound Off";
+
+  soundButton.setAttribute(
+    "aria-label",
+    soundEnabled ? "Turn sounds off" : "Turn sounds on",
+  );
+}
+
+updateSoundButton();
+
+function getAudioContext() {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+  if (!AudioContextClass) {
+    return null;
+  }
+
+  if (!audioContext) {
+    audioContext = new AudioContextClass();
+  }
+
+  if (audioContext.state === "suspended") {
+    audioContext.resume().catch(function () {});
+  }
+
+  return audioContext;
+}
+
+soundButton.addEventListener("click", function () {
+  soundEnabled = !soundEnabled;
+
+  updateSoundButton();
+
+  saveValue("quizSound", soundEnabled ? "on" : "off");
+
+  // Initialize audio after a user interaction.
+  if (soundEnabled) {
+    getAudioContext();
+    playSound("correct");
+  }
+});
+
+function playSound(type) {
+  if (!soundEnabled) {
+    return;
+  }
+
+  try {
+    const context = getAudioContext();
+
+    if (!context) {
+      return;
+    }
+
+    let frequencies;
+
+    if (type === "correct") {
+      frequencies = [660, 880];
+    } else if (type === "incorrect") {
+      frequencies = [300, 220];
+    } else if (type === "timeout") {
+      frequencies = [440, 330, 220];
+    } else {
+      return;
+    }
+
+    const now = context.currentTime;
+
+    frequencies.forEach(function (frequency, index) {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+
+      const startTime = now + index * 0.13;
+
+      oscillator.type = "sine";
+
+      oscillator.frequency.setValueAtTime(frequency, startTime);
+
+      gain.gain.setValueAtTime(0.0001, startTime);
+
+      gain.gain.exponentialRampToValueAtTime(0.12, startTime + 0.02);
+
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.12);
+
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+
+      oscillator.start(startTime);
+      oscillator.stop(startTime + 0.13);
+    });
+  } catch (error) {
+    console.warn("Could not play sound:", error);
+  }
+}
+
+// =========================
+// Shuffle Array
+// =========================
+
 function shuffleQuestions(array) {
   const shuffled = [...array];
 
@@ -239,7 +410,10 @@ function shuffleQuestions(array) {
   return shuffled;
 }
 
+// =========================
 // Start Quiz
+// =========================
+
 startButton.addEventListener("click", function () {
   selectedCategory = categorySelect.value;
   selectedDifficulty = difficultySelect.value;
@@ -260,6 +434,7 @@ startButton.addEventListener("click", function () {
 
   currentQuestionIndex = 0;
   score = 0;
+  answered = false;
 
   setupScreen.style.display = "none";
   resultScreen.style.display = "none";
@@ -273,7 +448,10 @@ startButton.addEventListener("click", function () {
   loadQuestion();
 });
 
+// =========================
 // Load Question
+// =========================
+
 function loadQuestion() {
   clearInterval(timerInterval);
 
@@ -314,7 +492,10 @@ function loadQuestion() {
   startTimer();
 }
 
-// Start Timer
+// =========================
+// Timer
+// =========================
+
 function startTimer() {
   clearInterval(timerInterval);
 
@@ -332,6 +513,8 @@ function startTimer() {
       if (!answered) {
         answered = true;
 
+        playSound("timeout");
+
         disableOptions();
         showCorrectAnswer();
 
@@ -341,7 +524,10 @@ function startTimer() {
   }, 1000);
 }
 
+// =========================
 // Select Answer
+// =========================
+
 function selectAnswer(selectedButton, selectedOption) {
   if (answered) {
     return;
@@ -355,9 +541,15 @@ function selectAnswer(selectedButton, selectedOption) {
 
   if (selectedOption === currentQuestion.answer) {
     score++;
+
     selectedButton.classList.add("correct");
+
+    playSound("correct");
   } else {
     selectedButton.classList.add("incorrect");
+
+    playSound("incorrect");
+
     showCorrectAnswer();
   }
 
@@ -366,7 +558,10 @@ function selectAnswer(selectedButton, selectedOption) {
   nextButton.style.display = "block";
 }
 
-// Disable options
+// =========================
+// Disable Options
+// =========================
+
 function disableOptions() {
   const optionButtons = optionsElement.querySelectorAll(".option-btn");
 
@@ -375,7 +570,10 @@ function disableOptions() {
   });
 }
 
-// Show correct answer
+// =========================
+// Show Correct Answer
+// =========================
+
 function showCorrectAnswer() {
   const currentQuestion = quizQuestions[currentQuestionIndex];
 
@@ -388,7 +586,10 @@ function showCorrectAnswer() {
   });
 }
 
+// =========================
 // Next Question
+// =========================
+
 nextButton.addEventListener("click", function () {
   currentQuestionIndex++;
 
@@ -399,7 +600,10 @@ nextButton.addEventListener("click", function () {
   }
 });
 
+// =========================
 // Show Result and Save History
+// =========================
+
 function showResult() {
   clearInterval(timerInterval);
 
@@ -414,11 +618,11 @@ function showResult() {
 
   percentageElement.textContent = `Percentage: ${percentage}%`;
 
-  // Update best score
+  // Update best score for this quiz selection.
   if (score > bestScore) {
     bestScore = score;
 
-    localStorage.setItem("quizBestScore", String(bestScore));
+    saveValue("quizBestScore", String(bestScore));
   }
 
   bestScoreElement.textContent = `Best Score: ${bestScore}`;
@@ -434,7 +638,7 @@ function showResult() {
     performanceElement.textContent = "Keep learning! You will improve.";
   }
 
-  // Create a history record
+  // Save quiz history
   const historyRecord = {
     category: selectedCategory,
     difficulty: selectedDifficulty,
@@ -444,18 +648,20 @@ function showResult() {
     date: new Date().toLocaleString(),
   };
 
-  // Add newest result at the beginning
   quizHistory.unshift(historyRecord);
 
-  // Save history in localStorage
-  try {
-    localStorage.setItem("quizHistory", JSON.stringify(quizHistory));
-  } catch (error) {
-    console.error("Unable to save quiz history:", error);
+  // Keep the latest 100 attempts.
+  if (quizHistory.length > 100) {
+    quizHistory = quizHistory.slice(0, 100);
   }
+
+  saveValue("quizHistory", JSON.stringify(quizHistory));
 }
 
+// =========================
 // Display Quiz History
+// =========================
+
 function displayHistory() {
   historyList.innerHTML = "";
 
@@ -474,15 +680,19 @@ function displayHistory() {
     historyCard.classList.add("history-card");
 
     const title = document.createElement("h3");
+
     title.textContent = `${record.category} - ${record.difficulty}`;
 
     const scoreText = document.createElement("p");
+
     scoreText.textContent = `Score: ${record.score}/${record.totalQuestions}`;
 
     const percentageText = document.createElement("p");
+
     percentageText.textContent = `Percentage: ${record.percentage}%`;
 
     const dateText = document.createElement("p");
+
     dateText.textContent = `Date: ${record.date}`;
 
     historyCard.appendChild(title);
@@ -494,13 +704,9 @@ function displayHistory() {
   });
 }
 
-// Create and show View History button on result screen
-const viewHistoryButton = document.createElement("button");
-
-viewHistoryButton.id = "view-history-btn";
-viewHistoryButton.textContent = "View Quiz History";
-
-resultScreen.appendChild(viewHistoryButton);
+// =========================
+// View Quiz History
+// =========================
 
 viewHistoryButton.addEventListener("click", function () {
   resultScreen.style.display = "none";
@@ -509,7 +715,10 @@ viewHistoryButton.addEventListener("click", function () {
   displayHistory();
 });
 
+// =========================
 // Back to Setup from Quiz
+// =========================
+
 backButton.addEventListener("click", function () {
   clearInterval(timerInterval);
 
@@ -537,7 +746,10 @@ backButton.addEventListener("click", function () {
   nextButton.style.display = "none";
 });
 
+// =========================
 // Back to Setup from History
+// =========================
+
 backToSetupButton.addEventListener("click", function () {
   historyScreen.style.display = "none";
   resultScreen.style.display = "none";
@@ -547,7 +759,10 @@ backToSetupButton.addEventListener("click", function () {
   introText.style.display = "block";
 });
 
+// =========================
 // Choose Again
+// =========================
+
 restartButton.addEventListener("click", function () {
   clearInterval(timerInterval);
 
